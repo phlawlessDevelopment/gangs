@@ -4,6 +4,8 @@ pub enum Views {
     Driving,
 }
 pub enum TbCombatPhases {
+    SetCanAttack,
+    SetupGui,
     PlayerSelectAction,
     AiSelectAction,
 }

@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::tb_combat::{Character, Seat};
+
 pub struct GuiPlugin;
 
 const NORMAL_BUTTON: Color = Color::rgb(0.75, 0.75, 0.75);
@@ -8,7 +10,7 @@ const PRESSED_BUTTON: Color = Color::rgb(0.35, 0.35, 0.35);
 
 impl Plugin for GuiPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(buttons).add_startup_system(setup);
+        app.add_system(button_events).add_startup_system(setup);
     }
 }
 
@@ -57,7 +59,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                             parent
                                 .spawn_bundle(NodeBundle {
                                     style: Style {
-                                        flex_direction: FlexDirection::Column,
+                                        flex_direction: FlexDirection::Row,
                                         ..default()
                                     },
                                     color: Color::rgba(0.0, 0.0, 0.0, 0.0).into(),
@@ -70,7 +72,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                                             style: Style {
                                                 size: Size {
                                                     width: Val::Px(200.0),
-                                                    height: Val::Percent(10.0),
+                                                    height: Val::Percent(50.0),
                                                 },
                                                 justify_content: JustifyContent::Center,
                                                 align_items: AlignItems::Center,
@@ -87,7 +89,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                                         .with_children(|parent| {
                                             parent.spawn_bundle(
                                                 TextBundle::from_section(
-                                                    "Change Lane",
+                                                    "Change Lane (Driver)",
                                                     TextStyle {
                                                         font: asset_server
                                                             .load("fonts/SourceCodePro.ttf"),
@@ -104,7 +106,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                                             style: Style {
                                                 size: Size {
                                                     width: Val::Px(200.0),
-                                                    height: Val::Percent(10.0),
+                                                    height: Val::Percent(50.0),
                                                 },
                                                 justify_content: JustifyContent::Center,
                                                 align_items: AlignItems::Center,
@@ -121,7 +123,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                                         .with_children(|parent| {
                                             parent.spawn_bundle(
                                                 TextBundle::from_section(
-                                                    "Dash",
+                                                    "Dash (Driver)",
                                                     TextStyle {
                                                         font: asset_server
                                                             .load("fonts/SourceCodePro.ttf"),
@@ -138,7 +140,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                                             style: Style {
                                                 size: Size {
                                                     width: Val::Px(200.0),
-                                                    height: Val::Percent(10.0),
+                                                    height: Val::Percent(50.0),
                                                 },
                                                 justify_content: JustifyContent::Center,
                                                 align_items: AlignItems::Center,
@@ -154,7 +156,69 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                                         })
                                         .with_children(|parent| {
                                             parent.spawn_bundle(TextBundle::from_section(
-                                                "Shoot",
+                                                "Shoot (Passenger)",
+                                                TextStyle {
+                                                    font: asset_server
+                                                        .load("fonts/SourceCodePro.ttf"),
+                                                    font_size: 24.0,
+                                                    color: Color::BLACK,
+                                                },
+                                            ));
+                                        });
+                                    parent
+                                        .spawn_bundle(ButtonBundle {
+                                            button: Button::default(),
+                                            style: Style {
+                                                size: Size {
+                                                    width: Val::Px(200.0),
+                                                    height: Val::Percent(50.0),
+                                                },
+                                                justify_content: JustifyContent::Center,
+                                                align_items: AlignItems::Center,
+                                                padding: UiRect::new(
+                                                    Val::Px(0.0),
+                                                    Val::Px(0.0),
+                                                    Val::Px(50.0),
+                                                    Val::Px(50.0),
+                                                ),
+                                                ..default()
+                                            },
+                                            ..default()
+                                        })
+                                        .with_children(|parent| {
+                                            parent.spawn_bundle(TextBundle::from_section(
+                                                "Shoot (Back R)",
+                                                TextStyle {
+                                                    font: asset_server
+                                                        .load("fonts/SourceCodePro.ttf"),
+                                                    font_size: 24.0,
+                                                    color: Color::BLACK,
+                                                },
+                                            ));
+                                        });
+                                    parent
+                                        .spawn_bundle(ButtonBundle {
+                                            button: Button::default(),
+                                            style: Style {
+                                                size: Size {
+                                                    width: Val::Px(200.0),
+                                                    height: Val::Percent(50.0),
+                                                },
+                                                justify_content: JustifyContent::Center,
+                                                align_items: AlignItems::Center,
+                                                padding: UiRect::new(
+                                                    Val::Px(0.0),
+                                                    Val::Px(0.0),
+                                                    Val::Px(50.0),
+                                                    Val::Px(50.0),
+                                                ),
+                                                ..default()
+                                            },
+                                            ..default()
+                                        })
+                                        .with_children(|parent| {
+                                            parent.spawn_bundle(TextBundle::from_section(
+                                                "Shoot (Back L)",
                                                 TextStyle {
                                                     font: asset_server
                                                         .load("fonts/SourceCodePro.ttf"),
@@ -171,12 +235,13 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         });
 }
 
-fn buttons(
+fn button_events(
     mut button_q: Query<
         (&Interaction, &mut UiColor, &Children),
         (Changed<Interaction>, With<Button>),
     >,
     text_q: Query<&Text>,
+    characters: Query<&Character>,
 ) {
     for (interaction, mut color, children) in button_q.iter_mut() {
         let text = text_q.get(children[0]).unwrap();
@@ -184,13 +249,21 @@ fn buttons(
             Interaction::Clicked => {
                 *color = PRESSED_BUTTON.into();
                 match text.sections[0].value.as_str() {
-                    "Change Lane" => {
-                        println!("Change Lane");
+                    "Change Lane (Driver)" => {
+                        if let Some(driver) = characters.iter().find(|c|c.seat == Seat::Driver){
+                            println!("Change Lane");
+                        }
                     }
-                    "Dash" => {
+                    "Dash (Driver)" => {
                         println!("Dash");
                     }
-                    "Shoot" => {
+                    "Shoot (Passenger)" => {
+                        println!("Shoot");
+                    }
+                    "Shoot (Back R)" => {
+                        println!("Shoot");
+                    }
+                    "Shoot (Back L)" => {
                         println!("Shoot");
                     }
                     _ => {}
