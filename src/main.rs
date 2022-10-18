@@ -3,12 +3,11 @@ use bevy_inspector_egui::WorldInspectorPlugin;
 
 mod camera;
 mod driving;
-mod gui;
 mod states;
 mod tb_combat;
 
 use crate::{
-    camera::CameraPlugin, driving::DrivingPlugin, gui::GuiPlugin, states::Views,
+    camera::CameraPlugin, driving::DrivingPlugin, states::Views, tb_combat::gui::GuiPlugin,
     tb_combat::TBCombatPlugin,
 };
 

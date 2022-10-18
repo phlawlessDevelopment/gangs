@@ -304,7 +304,7 @@ fn button_events(
                     *color = NORMAL_BUTTON.into();
                 }
             },
-            Err(_) => {},
+            Err(_) => {}
         },
         None => {}
     }
@@ -324,7 +324,7 @@ fn button_events(
                     *color = NORMAL_BUTTON.into();
                 }
             },
-            Err(_) => {},
+            Err(_) => {}
         },
         None => {}
     }
@@ -344,7 +344,7 @@ fn button_events(
                     *color = NORMAL_BUTTON.into();
                 }
             },
-            Err(_) => {},
+            Err(_) => {}
         },
         None => {}
     }
@@ -352,7 +352,7 @@ fn button_events(
         Some(button) => match buttons_q.get_mut(button) {
             Ok((interaction, mut color)) => match interaction {
                 Interaction::Clicked => {
-                    if let Some(driver) = characters.iter().find(|c| c.seat == Seat::Driver) {
+                    if let Some(driver) = characters.iter().find(|c| c.seat == Seat::Passenger) {
                         println!("Shoot Passenger");
                     }
                     *color = PRESSED_BUTTON.into();
@@ -364,7 +364,7 @@ fn button_events(
                     *color = NORMAL_BUTTON.into();
                 }
             },
-            Err(_) => {},
+            Err(_) => {}
         },
         None => {}
     }
@@ -372,7 +372,7 @@ fn button_events(
         Some(button) => match buttons_q.get_mut(button) {
             Ok((interaction, mut color)) => match interaction {
                 Interaction::Clicked => {
-                    if let Some(driver) = characters.iter().find(|c| c.seat == Seat::Driver) {
+                    if let Some(driver) = characters.iter().find(|c| c.seat == Seat::BackLeft) {
                         println!("Shoot Back Left");
                     }
                     *color = PRESSED_BUTTON.into();
@@ -384,7 +384,7 @@ fn button_events(
                     *color = NORMAL_BUTTON.into();
                 }
             },
-            Err(_) => {},
+            Err(_) => {}
         },
         None => {}
     }
@@ -392,7 +392,7 @@ fn button_events(
         Some(button) => match buttons_q.get_mut(button) {
             Ok((interaction, mut color)) => match interaction {
                 Interaction::Clicked => {
-                    if let Some(driver) = characters.iter().find(|c| c.seat == Seat::Driver) {
+                    if let Some(driver) = characters.iter().find(|c| c.seat == Seat::BackRight) {
                         println!("Shoot Back Right");
                     }
                     *color = PRESSED_BUTTON.into();
@@ -404,7 +404,7 @@ fn button_events(
                     *color = NORMAL_BUTTON.into();
                 }
             },
-            Err(_) => {},
+            Err(_) => {}
         },
         None => {}
     }
