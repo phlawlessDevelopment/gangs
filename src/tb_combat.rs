@@ -49,6 +49,11 @@ struct CharactersCanAttack {
     back_right: bool,
     back_left: bool,
 }
+#[derive(Default)]
+pub struct VehicleMovement {
+    pub vehicle: Option<Entity>,
+    pub movement: Vec2,
+}
 
 fn create_vehicle(
     commands: &mut Commands,
@@ -443,11 +448,32 @@ fn set_can_attack(
         }
     }
 }
+fn do_move(
+    mut vehicle_movement_res: ResMut<VehicleMovement>,
+    mut vehicles: Query<&mut Transform, With<Vehicle>>,
+) {
+    match vehicle_movement_res.vehicle {
+        Some(entity) => match vehicles.get_mut(entity) {
+            Ok(mut transform) => {
+                transform.translation += Vec3::new(
+                    vehicle_movement_res.movement.x * 128.0,
+                    vehicle_movement_res.movement.y * 128.0,
+                    0.0
+                );
+                vehicle_movement_res.vehicle = None
+            }
+            Err(_) => {}
+        },
+        None => {},
+    }
+}
 
 impl Plugin for TBCombatPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<CharactersCanAttack>()
+            .init_resource::<VehicleMovement>()
             .add_startup_system(setup)
+            .add_system(do_move)
             .add_system(set_can_attack);
     }
 }

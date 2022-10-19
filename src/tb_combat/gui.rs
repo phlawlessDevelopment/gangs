@@ -2,6 +2,8 @@ use bevy::prelude::*;
 
 use crate::tb_combat::{Character, Seat};
 
+use super::{Team, Vehicle, VehicleMovement};
+
 pub struct GuiPlugin;
 
 const NORMAL_BUTTON: Color = Color::rgb(0.75, 0.75, 0.75);
@@ -287,126 +289,129 @@ fn button_events(
     mut buttons_q: Query<(&Interaction, &mut UiColor), (Changed<Interaction>, With<Button>)>,
     buttons: Res<Buttons>,
     characters: Query<&Character>,
+    vehicles: Query<(Entity, &Vehicle)>,
+    mut vehicle_movement_res: ResMut<VehicleMovement>,
 ) {
-    match buttons.change_lane_l {
-        Some(button) => match buttons_q.get_mut(button) {
-            Ok((interaction, mut color)) => match interaction {
-                Interaction::Clicked => {
-                    if let Some(driver) = characters.iter().find(|c| c.seat == Seat::Driver) {
-                        println!("Change Left");
+    if let Some((entity, vehicle)) = vehicles.iter().find(|(e, v)| v.team == Team::Player) {
+        match buttons.change_lane_l {
+            Some(button) => match buttons_q.get_mut(button) {
+                Ok((interaction, mut color)) => match interaction {
+                    Interaction::Clicked => {
+                        vehicle_movement_res.vehicle = entity.into();
+                        vehicle_movement_res.movement = Vec2::new(0.0, -1.0);
+                        *color = PRESSED_BUTTON.into();
                     }
-                    *color = PRESSED_BUTTON.into();
-                }
-                Interaction::Hovered => {
-                    *color = HOVERED_BUTTON.into();
-                }
-                Interaction::None => {
-                    *color = NORMAL_BUTTON.into();
-                }
-            },
-            Err(_) => {}
-        },
-        None => {}
-    }
-    match buttons.change_lane_r {
-        Some(button) => match buttons_q.get_mut(button) {
-            Ok((interaction, mut color)) => match interaction {
-                Interaction::Clicked => {
-                    if let Some(driver) = characters.iter().find(|c| c.seat == Seat::Driver) {
-                        println!("Change Right");
+                    Interaction::Hovered => {
+                        *color = HOVERED_BUTTON.into();
                     }
-                    *color = PRESSED_BUTTON.into();
-                }
-                Interaction::Hovered => {
-                    *color = HOVERED_BUTTON.into();
-                }
-                Interaction::None => {
-                    *color = NORMAL_BUTTON.into();
-                }
-            },
-            Err(_) => {}
-        },
-        None => {}
-    }
-    match buttons.dash {
-        Some(button) => match buttons_q.get_mut(button) {
-            Ok((interaction, mut color)) => match interaction {
-                Interaction::Clicked => {
-                    if let Some(driver) = characters.iter().find(|c| c.seat == Seat::Driver) {
-                        println!("Dash");
+                    Interaction::None => {
+                        *color = NORMAL_BUTTON.into();
                     }
-                    *color = PRESSED_BUTTON.into();
-                }
-                Interaction::Hovered => {
-                    *color = HOVERED_BUTTON.into();
-                }
-                Interaction::None => {
-                    *color = NORMAL_BUTTON.into();
-                }
+                },
+                Err(_) => {}
             },
-            Err(_) => {}
-        },
-        None => {}
-    }
-    match buttons.shoot_passenger {
-        Some(button) => match buttons_q.get_mut(button) {
-            Ok((interaction, mut color)) => match interaction {
-                Interaction::Clicked => {
-                    if let Some(driver) = characters.iter().find(|c| c.seat == Seat::Passenger) {
-                        println!("Shoot Passenger");
+            None => {}
+        }
+        match buttons.change_lane_r {
+            Some(button) => match buttons_q.get_mut(button) {
+                Ok((interaction, mut color)) => match interaction {
+                    Interaction::Clicked => {
+                        vehicle_movement_res.vehicle = entity.into();
+                        vehicle_movement_res.movement = Vec2::new(0.0, 1.0);
+                        *color = PRESSED_BUTTON.into();
                     }
-                    *color = PRESSED_BUTTON.into();
-                }
-                Interaction::Hovered => {
-                    *color = HOVERED_BUTTON.into();
-                }
-                Interaction::None => {
-                    *color = NORMAL_BUTTON.into();
-                }
-            },
-            Err(_) => {}
-        },
-        None => {}
-    }
-    match buttons.shoot_back_l {
-        Some(button) => match buttons_q.get_mut(button) {
-            Ok((interaction, mut color)) => match interaction {
-                Interaction::Clicked => {
-                    if let Some(driver) = characters.iter().find(|c| c.seat == Seat::BackLeft) {
-                        println!("Shoot Back Left");
+                    Interaction::Hovered => {
+                        *color = HOVERED_BUTTON.into();
                     }
-                    *color = PRESSED_BUTTON.into();
-                }
-                Interaction::Hovered => {
-                    *color = HOVERED_BUTTON.into();
-                }
-                Interaction::None => {
-                    *color = NORMAL_BUTTON.into();
-                }
-            },
-            Err(_) => {}
-        },
-        None => {}
-    }
-    match buttons.shoot_back_r {
-        Some(button) => match buttons_q.get_mut(button) {
-            Ok((interaction, mut color)) => match interaction {
-                Interaction::Clicked => {
-                    if let Some(driver) = characters.iter().find(|c| c.seat == Seat::BackRight) {
-                        println!("Shoot Back Right");
+                    Interaction::None => {
+                        *color = NORMAL_BUTTON.into();
                     }
-                    *color = PRESSED_BUTTON.into();
-                }
-                Interaction::Hovered => {
-                    *color = HOVERED_BUTTON.into();
-                }
-                Interaction::None => {
-                    *color = NORMAL_BUTTON.into();
-                }
+                },
+                Err(_) => {}
             },
-            Err(_) => {}
-        },
-        None => {}
+            None => {}
+        }
+        match buttons.dash {
+            Some(button) => match buttons_q.get_mut(button) {
+                Ok((interaction, mut color)) => match interaction {
+                    Interaction::Clicked => {
+                        vehicle_movement_res.vehicle = entity.into();
+                        vehicle_movement_res.movement = Vec2::new(-2.0, 0.0);
+                        *color = PRESSED_BUTTON.into();
+                    }
+                    Interaction::Hovered => {
+                        *color = HOVERED_BUTTON.into();
+                    }
+                    Interaction::None => {
+                        *color = NORMAL_BUTTON.into();
+                    }
+                },
+                Err(_) => {}
+            },
+            None => {}
+        }
+        match buttons.shoot_passenger {
+            Some(button) => match buttons_q.get_mut(button) {
+                Ok((interaction, mut color)) => match interaction {
+                    Interaction::Clicked => {
+                        if let Some(driver) = characters.iter().find(|c| c.seat == Seat::Passenger)
+                        {
+                            println!("Shoot Passenger");
+                        }
+                        *color = PRESSED_BUTTON.into();
+                    }
+                    Interaction::Hovered => {
+                        *color = HOVERED_BUTTON.into();
+                    }
+                    Interaction::None => {
+                        *color = NORMAL_BUTTON.into();
+                    }
+                },
+                Err(_) => {}
+            },
+            None => {}
+        }
+        match buttons.shoot_back_l {
+            Some(button) => match buttons_q.get_mut(button) {
+                Ok((interaction, mut color)) => match interaction {
+                    Interaction::Clicked => {
+                        if let Some(driver) = characters.iter().find(|c| c.seat == Seat::BackLeft) {
+                            println!("Shoot Back Left");
+                        }
+                        *color = PRESSED_BUTTON.into();
+                    }
+                    Interaction::Hovered => {
+                        *color = HOVERED_BUTTON.into();
+                    }
+                    Interaction::None => {
+                        *color = NORMAL_BUTTON.into();
+                    }
+                },
+                Err(_) => {}
+            },
+            None => {}
+        }
+        match buttons.shoot_back_r {
+            Some(button) => match buttons_q.get_mut(button) {
+                Ok((interaction, mut color)) => match interaction {
+                    Interaction::Clicked => {
+                        if let Some(driver) = characters.iter().find(|c| c.seat == Seat::BackRight)
+                        {
+                            println!("Shoot Back Right");
+                        }
+                        *color = PRESSED_BUTTON.into();
+                    }
+                    Interaction::Hovered => {
+                        *color = HOVERED_BUTTON.into();
+                    }
+                    Interaction::None => {
+                        *color = NORMAL_BUTTON.into();
+                    }
+                },
+                Err(_) => {}
+            },
+            None => {}
+        }
     }
 }
 impl Plugin for GuiPlugin {
